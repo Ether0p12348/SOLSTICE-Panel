@@ -44,7 +44,7 @@ If your hardware differs, review and adjust:
 
 ```bash
 cd /tmp
-wget https://github.com/Ether0p12348/SOLSTICE-Panel/releases/download/<tag>/solstice-panel-aarch64.tar.gz
+wget https://github.com/Ether0p12348/SOLSTICE-Panel/releases/download/v1.0.0/solstice-panel-aarch64.tar.gz
 tar -xzf solstice-panel-aarch64.tar.gz
 sudo mkdir -p /opt/solstice-panel
 sudo rsync -a --delete solstice-panel-aarch64/ /opt/solstice-panel/
