@@ -219,7 +219,7 @@ Contributions are welcome.
 
 Before opening a PR, read and follow:
 
-- [`LICENSE.md`](./LICENSE)
+- [`LICENSE`](./LICENSE)
 
 If your contribution changes behavior, include:
 
@@ -235,4 +235,4 @@ If your contribution changes behavior, include:
 
 ## License
 
-See [`LICENSE.md`](./LICENSE).
+See [`LICENSE`](./LICENSE).
