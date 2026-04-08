@@ -42,11 +42,9 @@ If your hardware differs, review and adjust:
 
 ## Quick Install (Prebuilt Binary)
 
-If you publish GitHub Releases, install like this:
-
 ```bash
 cd /tmp
-wget https://github.com/<your-org-or-user>/solstice-panel/releases/download/<tag>/solstice-panel-aarch64.tar.gz
+wget https://github.com/Ether0p12348/SOLSTICE-Panel/releases/download/<tag>/solstice-panel-aarch64.tar.gz
 tar -xzf solstice-panel-aarch64.tar.gz
 sudo mkdir -p /opt/solstice-panel
 sudo rsync -a --delete solstice-panel-aarch64/ /opt/solstice-panel/
@@ -81,7 +79,7 @@ cargo --version
 ### 3. Clone and build
 
 ```bash
-git clone https://github.com/<your-org-or-user>/solstice-panel.git
+git clone https://github.com/Ether0p12348/SOLSTICE-Panel.git
 cd solstice-panel
 cargo build --release
 ```
@@ -109,7 +107,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=root
+User=<user>
 WorkingDirectory=/opt/solstice-panel
 ExecStart=/opt/solstice-panel/target/release/solstice-panel
 Restart=on-failure
