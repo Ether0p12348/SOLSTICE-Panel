@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block nav_led_studio %}active{% endblock %}
+{% block workspace_title %}LED Studio{% endblock %}
+{% block workspace_subtitle %}Mode-first studio using consolidated LED-lab mode config. Fan controls live on Dashboard only.{% endblock %}
+{% block workspace_actions %}
+<div class="studio-actions">
+    <button class="ghost" type="button" onclick="refreshAll()">Refresh</button>
+    <button class="ghost" type="button" onclick="playRuntime()">Play</button>
+    <button class="ghost" type="button" onclick="pauseRuntime()">Pause</button>
+</div>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="/assets/css/led_studio.css">
+
+<div class="studio-layout">
+    <section class="stack">
+        <div class="card">
+            <h2 class="section-title">Built-in Modes</h2>
+            <p class="section-subtitle">Configured directly from <code>led-lab.json</code> effect commands.</p>
+            <div id="modeGrid" class="mode-grid" style="margin-top: 0.5rem;"></div>
+        </div>
+
+        <div id="customPanel" class="card custom-card">
+            <h2 class="section-title">Mode Customization</h2>
+            <p id="customModeCaption" class="section-subtitle">Only fields enabled for the selected mode are shown.</p>
+
+            <div id="speedSection" style="display: none; margin-top: 0.55rem;">
+                <div class="muted" style="font-size: 0.8rem; margin-bottom: 0.3rem;">Speed (<code>0x05</code>)</div>
+                <div id="speedGrid" class="value-grid"></div>
+            </div>
+
+            <div id="colorSection" style="display: none; margin-top: 0.65rem;">
+                <div class="muted" style="font-size: 0.8rem; margin-bottom: 0.3rem;">Color Preset (<code>0x06</code>)</div>
+                <div id="colorGrid" class="value-grid"></div>
+            </div>
+
+            <div id="directSection" style="display: none; margin-top: 0.65rem;">
+                <div class="muted" style="font-size: 0.8rem; margin-bottom: 0.3rem;">Direct Pixel Write (Effect-00)</div>
+                <div class="row">
+                    <label style="flex: 1 1 120px;">LED Index (0-13)
+                        <input id="directPixelIndex" type="number" min="0" max="13" value="0">
+                    </label>
+                    <label style="flex: 1 1 160px;">HEX Color (RRGGBB)
+                        <input id="directPixelHex" type="text" value="00ff88" maxlength="7">
+                    </label>
+                </div>
+                <div class="row" style="margin-top: 0.45rem;">
+                    <button class="ghost" type="button" onclick="writeDirectPixel()">Write Pixel</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <aside class="stack">
+        <div class="card">
+            <h2 class="section-title">Runtime Override</h2>
+            <p class="section-subtitle">Apply selected mode directly to hardware controller runtime.</p>
+
+            <div class="switch-row" style="margin-top: 0.5rem;">
+                <div>
+                    <div><strong>Controller Override</strong></div>
+                    <div class="muted" style="font-size: 0.8rem;">Enabled means selected mode drives hardware directly.</div>
+                </div>
+                <label class="switch" title="Controller override">
+                    <input id="overrideToggle" type="checkbox">
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+
+            <div class="row" style="margin-top: 0.6rem;">
+                <button class="primary" type="button" onclick="applySelectedMode()">Apply Selected Mode</button>
+                <button class="ghost" type="button" onclick="disableOverride()">Disable Override</button>
+            </div>
+
+            <div id="runtimePane" class="runtime-pane" style="margin-top: 0.6rem;">Loading runtime status...</div>
+            <div id="studioFeedback" class="feedback" style="margin-top: 0.45rem;"></div>
+        </div>
+    </aside>
+</div>
+
+<script>
+    window.LED_STUDIO_BOOTSTRAP = {
+        labState: {{ lab_bootstrap_json | safe }}
+    };
+</script>
+<script src="/assets/js/led_studio.js"></script>
+{% endblock %}

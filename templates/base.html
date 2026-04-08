@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{ page_title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link
+        rel="icon"
+        type="image/svg+xml"
+        href="/assets/logos/SOLSTICE-Logo-Black.svg"
+        media="(prefers-color-scheme: light)"
+    >
+    <link
+        rel="icon"
+        type="image/svg+xml"
+        href="/assets/logos/SOLSTICE-Logo-White.svg"
+        media="(prefers-color-scheme: dark)"
+    >
+    <link rel="stylesheet" href="/assets/css/base.css">
+
+</head>
+<body>
+<div class="app-shell">
+    <aside class="workspace-rail">
+        <div class="rail-brand">
+            <div class="rail-logo" aria-label="SOLSTICE">
+                <img src="/assets/logos/SOLSTICE-Logo-White.svg" alt="SOLSTICE">
+            </div>
+            <div class="rail-brand-text">SOLSTICE</div>
+        </div>
+
+        <nav class="rail-nav">
+            <a href="/" class="rail-link {% block nav_dashboard %}{% endblock %}">
+                <span class="rail-icon icon-dashboard" aria-hidden="true"></span>
+                <span class="rail-label">Dashboard</span>
+            </a>
+            <a href="/processes" class="rail-link {% block nav_process_explorer %}{% endblock %}">
+                <span class="rail-icon icon-process-explorer" aria-hidden="true"></span>
+                <span class="rail-label">Process Explorer</span>
+            </a>
+            <a href="/studio" class="rail-link {% block nav_studio %}{% endblock %}">
+                <span class="rail-icon icon-studio" aria-hidden="true"></span>
+                <span class="rail-label">OLED Studio</span>
+            </a>
+            <a href="/led" class="rail-link {% block nav_led_studio %}{% endblock %}">
+                <span class="rail-icon icon-led-studio" aria-hidden="true"></span>
+                <span class="rail-label">LED Studio</span>
+            </a>
+            <a href="/configuration" class="rail-link {% block nav_configuration %}{% endblock %}">
+                <span class="rail-icon icon-configuration" aria-hidden="true"></span>
+                <span class="rail-label">Configuration</span>
+            </a>
+        </nav>
+
+        <div class="rail-foot">workspace</div>
+    </aside>
+
+    <section class="app-main">
+        <header class="workspace-bar">
+            <div class="workspace-heading">
+                <div class="workspace-eyebrow">SOLSTICE Panel</div>
+                <div class="workspace-title">{% block workspace_title %}Workspace{% endblock %}</div>
+                <div class="workspace-subtitle">{% block workspace_subtitle %}{% endblock %}</div>
+            </div>
+            <div class="workspace-actions">{% block workspace_actions %}{% endblock %}</div>
+        </header>
+
+        <main class="workspace-body">
+            {% block content %}{% endblock %}
+        </main>
+    </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+[display]
+enabled = true
+width = 128
+height = 32
+i2c_path = "/dev/i2c-7"
+address = 60
+
+[runtime]
+refresh_ms = 200
+
+[web]
+bind = "0.0.0.0:8080"
+
+[led]
+enabled = true
+default_effect_id = "effect-03"
+i2c_path = "/dev/i2c-7"
+address = 14
+hardware_led_count = 14
+
+[fan]
+auto_on_temp_c = 55

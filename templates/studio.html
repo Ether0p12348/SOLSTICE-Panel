@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block nav_studio %}active{% endblock %}
+{% block workspace_title %}OLED Studio Workspace{% endblock %}
+{% block workspace_subtitle %}Select a page, edit directly on canvas, and adjust properties in the inspector.{% endblock %}
+{% block workspace_actions %}
+<div class="studio-actions">
+    <div class="studio-action-group">
+        <span class="studio-action-label">Page</span>
+        <button class="ghost" type="button" onclick="applyCurrentPage()">Apply</button>
+        <button class="primary" type="button" onclick="saveCurrentPageQuick()">Save Page</button>
+    </div>
+    <div class="studio-action-group">
+        <span class="studio-action-label">Share</span>
+        <button class="ghost" type="button" onclick="openTransferDialog()">Import / Export</button>
+    </div>
+    <div class="studio-action-group">
+        <span class="studio-action-label">Insert</span>
+        <button class="ghost" type="button" onclick="insertElement('static_text')">+ Text</button>
+        <button class="ghost" type="button" onclick="insertElement('dynamic_text')">+ Dynamic</button>
+        <button class="ghost" type="button" onclick="insertElement('rect')">+ Rect</button>
+        <button class="ghost" type="button" onclick="insertElement('image')">+ Image</button>
+        <button class="ghost" type="button" onclick="insertElement('line')">+ Line</button>
+    </div>
+    <div class="studio-action-group">
+        <span class="studio-action-label">Runtime</span>
+        <button class="primary" type="button" onclick="savePublishedRuntime()">Save Runtime</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="/assets/css/studio.css">
+
+<div class="studio-shell">
+    <aside class="studio-left">
+        <section class="card stack">
+            <div>
+                <h2 class="section-title">Page Catalog</h2>
+                <p class="section-subtitle">Page/system context. Select a page to edit in the center canvas.</p>
+            </div>
+            <div class="page-list" id="pageCatalogList"></div>
+            <label>
+                New page name
+                <input id="newPageName" type="text" placeholder="new-page-name">
+            </label>
+            <button onclick="createPage()">Create Blank Page</button>
+        </section>
+
+        <section class="card stack">
+            <div class="panel-title-row">
+                <h2 class="section-title">Published Runtime</h2>
+                <div class="row">
+                    <span class="badge">Scheduler</span>
+                    <button class="runtime-mini-btn" onclick="savePublishedRuntime()">Save</button>
+                </div>
+            </div>
+            <p class="section-subtitle">Runtime scheduling context for boot and rotation. Page editing happens in canvas + inspector.</p>
+
+            <div class="stack">
+                <div class="inspector-group stack">
+                    <div class="panel-title-row">
+                        <h3>Boot Sequence</h3>
+                        <button class="runtime-mini-btn" onclick="addBootStep()">Add Step</button>
+                    </div>
+                    <div id="bootSequenceList" class="runtime-list"></div>
+                </div>
+
+                <div class="inspector-group stack">
+                    <div class="panel-title-row">
+                        <h3>Rotation Queue</h3>
+                        <button class="runtime-mini-btn" onclick="addRotationEntry()">Add Entry</button>
+                    </div>
+                    <label>
+                        Rotation interval (ms)
+                        <input id="rotationIntervalInput" type="number" min="250" step="50" onchange="setRotationInterval(this.value)">
+                    </label>
+                    <div id="rotationQueueList" class="runtime-list"></div>
+                </div>
+
+                <div id="publishedRuntimeFeedback" class="runtime-feedback muted"></div>
+
+                <details class="advanced">
+                    <summary>Advanced: Raw Published Spec JSON</summary>
+                    <div class="stack" style="margin-top: 0.75rem;">
+                        <textarea id="publishedSpecEditor">{{ published_spec_json }}</textarea>
+                        <div class="row">
+                            <button class="runtime-mini-btn" onclick="applyRawPublishedSpecToGui()">Load JSON</button>
+                            <button class="runtime-mini-btn" onclick="savePublishedSpecRaw()">Save Raw</button>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </section>
+    </aside>
+
+    <section class="studio-center">
+        <section class="card canvas-card">
+            <div class="canvas-meta">
+                <h2 class="section-title">Editor Canvas</h2>
+                <span class="badge" id="pageEditorModeBadge">No Selection</span>
+            </div>
+            <p class="section-subtitle">Click elements to select. Drag selected elements to move on integer OLED coordinates.</p>
+
+            <div class="canvas-status-bar">
+                <div class="canvas-status-item canvas-status-page">
+                    <strong>Page</strong>
+                    <div id="canvasPageMetaMain" class="canvas-page-main">No page selected</div>
+                    <div id="canvasPageMetaList" class="canvas-page-meta-row"></div>
+                </div>
+                <div class="canvas-status-item"><strong>Selection</strong><span id="canvasSelectionMeta">None</span></div>
+            </div>
+
+            <div class="canvas-toolbar">
+                <div class="canvas-tool-group">
+                    <span class="toolbar-label">Selection</span>
+                    <button class="toolbar-btn" onclick="selectElement(null)">Clear Selection</button>
+                </div>
+                <div class="canvas-tool-group">
+                    <span class="toolbar-label">Workspace</span>
+                    <button class="toolbar-btn" onclick="openTransferDialog()">Open Import / Export</button>
+                </div>
+            </div>
+
+            <div class="canvas-stage" id="canvasStage">
+                <div class="canvas-viewport">
+                    <div class="canvas-wrap" id="canvasWrap">
+                        <canvas
+                            id="studioPreview"
+                            class="preview"
+                            width="{{ display_width }}"
+                            height="{{ display_height }}"
+                            style="width: {{ preview_css_width }}px; height: {{ preview_css_height }}px;"
+                        ></canvas>
+                        <div id="studioOverlay" class="studio-overlay" title="Canvas overlay"></div>
+                    </div>
+                </div>
+                <div id="canvasEmptyState" class="canvas-empty-state">Select a page from the catalog to start editing.</div>
+            </div>
+
+            <div id="canvasHint" class="canvas-hint">Select a page to begin editing.</div>
+        </section>
+    </section>
+
+    <aside class="studio-right" id="pageEditorBlock">
+        <section class="card stack">
+            <div class="panel-title-row">
+                <h2 class="section-title">Inspector</h2>
+                <span id="inspectorScopeBadge" class="badge">Page</span>
+            </div>
+            <p id="inspectorSelectionSummary" class="section-subtitle">Page properties appear when nothing is selected.</p>
+            <p id="editorModeHelp" class="editor-disabled-note"></p>
+            <div id="inspectorPanel"></div>
+            <div id="inspectorFeedback" class="inspector-feedback"></div>
+        </section>
+
+        <section class="card stack">
+            <div class="panel-title-row">
+                <h2 class="section-title">Objects / Layers</h2>
+                <span class="badge" id="layerCountBadge">0</span>
+            </div>
+            <p class="section-subtitle">Render order follows list order. Select rows to edit in inspector.</p>
+            <div id="elementsList" class="layer-list"></div>
+        </section>
+    </aside>
+</div>
+
+<dialog id="transferDialog" class="transfer-dialog">
+    <div class="transfer-dialog-head">
+        <div>
+            <h2 class="section-title">Page Import / Export</h2>
+            <p class="section-subtitle">Share single-page JSON objects from a high-level workspace tool.</p>
+        </div>
+        <button type="button" onclick="closeTransferDialog()">Close</button>
+    </div>
+    <div class="transfer-dialog-body">
+        <div class="row">
+            <button onclick="exportCurrentPageJson()">Export Current</button>
+            <button onclick="copyTransferJson()">Copy JSON</button>
+            <button onclick="downloadTransferJson()">Download</button>
+        </div>
+        <textarea id="pageTransferJson" placeholder='Paste exported page JSON here for import'></textarea>
+        <div class="row">
+            <label style="min-width: 220px;">
+                Conflict behavior
+                <select id="importConflictPolicy">
+                    <option value="duplicate">duplicate (recommended)</option>
+                    <option value="replace">replace existing ID</option>
+                    <option value="error">error if ID exists</option>
+                </select>
+            </label>
+            <button onclick="importPageJson()">Import Page JSON</button>
+        </div>
+        <div id="pageTransferFeedback" class="runtime-feedback muted"></div>
+    </div>
+</dialog>
+
+<script>
+    window.STUDIO_BOOTSTRAP = {
+        pageCatalog: {{ page_catalog_json | safe }},
+        publishedSpec: {{ published_spec_json | safe }},
+        initialCatalogKey: "{{ initial_catalog_key }}"
+    };
+</script>
+<script src="/assets/js/studio.js"></script>
+{% endblock %}

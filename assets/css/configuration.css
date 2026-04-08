@@ -1,0 +1,164 @@
+    .config-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+    }
+
+    .config-action-label {
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #8fa0b6;
+        padding: 0 0.2rem;
+    }
+
+    .configuration-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 380px;
+        gap: 0.78rem;
+        align-items: start;
+    }
+
+    .config-main,
+    .config-side {
+        display: grid;
+        gap: 0.7rem;
+        align-content: start;
+    }
+
+    .config-side {
+        position: sticky;
+        top: 76px;
+    }
+
+    .config-sections {
+        display: grid;
+        gap: 0.58rem;
+    }
+
+    .config-section-card {
+        padding: 0.72rem 0.78rem;
+        border: 0;
+        box-shadow: none;
+        background: linear-gradient(180deg, rgba(20, 30, 44, 0.68) 0%, rgba(18, 27, 39, 0.68) 100%);
+    }
+
+    .config-field-list {
+        display: grid;
+        gap: 0.42rem;
+        margin-top: 0.4rem;
+    }
+
+    .config-field {
+        display: grid;
+        gap: 0.28rem;
+        padding: 0.46rem 0.52rem;
+        border: 0;
+        border-radius: 9px;
+        background: rgba(16, 23, 34, 0.86);
+    }
+
+    .config-field-advanced {
+        border: 1px dashed rgba(97, 130, 168, 0.46);
+        background: rgba(15, 23, 35, 0.82);
+    }
+
+    .config-field-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-items: center;
+    }
+
+    .config-field-title {
+        margin: 0;
+        font-size: 0.92rem;
+    }
+
+    .restart-flag {
+        color: #ff7777;
+        font-weight: 700;
+        margin-right: 0.25rem;
+    }
+
+    .config-bool-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        border: 1px solid rgba(108, 134, 167, 0.24);
+        border-radius: 9px;
+        background: rgba(17, 26, 39, 0.75);
+        padding: 0.52rem 0.58rem;
+    }
+
+    .config-section-meta {
+        margin: 0.18rem 0 0 0;
+        color: var(--muted);
+        font-size: 0.84rem;
+    }
+
+    .runtime-feedback {
+        min-height: 1.2rem;
+        font-size: 0.9rem;
+        color: var(--muted);
+    }
+
+    .runtime-feedback.error {
+        color: #ff9f9f;
+    }
+
+    .runtime-feedback.ok {
+        color: var(--ok);
+    }
+
+    .config-help-card {
+        border: 0;
+        border-radius: 9px;
+        background: rgba(17, 26, 39, 0.66);
+        padding: 0.62rem 0.68rem;
+        color: #9fb0c8;
+        font-size: 0.83rem;
+    }
+
+    .action-stack {
+        display: grid;
+        gap: 0.42rem;
+    }
+
+    details.advanced summary {
+        cursor: pointer;
+        color: var(--muted);
+    }
+
+    details.advanced {
+        border: 1px solid rgba(117, 143, 176, 0.22);
+        border-radius: 9px;
+        background: rgba(16, 25, 37, 0.72);
+        padding: 0.5rem 0.58rem;
+    }
+
+    details.section-advanced summary {
+        cursor: pointer;
+        color: #a7bbd5;
+        font-size: 0.82rem;
+    }
+
+    details.section-advanced {
+        border: 1px dashed rgba(97, 130, 168, 0.42);
+        border-radius: 9px;
+        background: rgba(12, 20, 30, 0.55);
+        padding: 0.5rem 0.58rem;
+        margin-top: 0.5rem;
+    }
+
+    @media (max-width: 1240px) {
+        .configuration-shell {
+            grid-template-columns: 1fr;
+        }
+
+        .config-side {
+            position: static;
+        }
+    }

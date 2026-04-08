@@ -1,0 +1,16 @@
+{
+  "boot_sequence": [
+    {
+      "page_id": "avidzenith-1.0.0-title-boot",
+      "duration_ms": 10000
+    },
+    {
+      "page_id": "local-custom-1.0.0-sosltice-boot",
+      "duration_ms": 5000
+    }
+  ],
+  "rotation_interval_ms": 5000,
+  "rotation_queue": [
+    "avidzenith-1.0.0-info-display"
+  ]
+}

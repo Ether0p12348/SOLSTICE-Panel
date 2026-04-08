@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block nav_dashboard %}active{% endblock %}
+{% block workspace_title %}Dashboard Workspace{% endblock %}
+{% block workspace_subtitle %}Live runtime control, preview, and published schedule visibility.{% endblock %}
+{% block workspace_actions %}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="/assets/css/dashboard.css">
+
+<div class="dashboard-layout">
+    <section class="dashboard-main">
+        <div class="card">
+            <div class="row" style="justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h2 class="section-title">Live OLED Preview</h2>
+                    <p class="section-subtitle">True monochrome framebuffer stream from live SSE updates.</p>
+                </div>
+                <span class="badge">Panel {{ display_width }}x{{ display_height }}</span>
+            </div>
+
+            <div class="preview-frame">
+                <div class="preview-caption">Physical Display Feed</div>
+                <canvas
+                    id="oledPreview"
+                    class="preview"
+                    width="{{ display_width }}"
+                    height="{{ display_height }}"
+                    style="width: {{ preview_css_width }}px; height: {{ preview_css_height }}px;"
+                ></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="row" style="justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h2 class="section-title">Temporary Live Controls</h2>
+                    <p class="section-subtitle">Affect runtime state immediately without editing published definitions.</p>
+                </div>
+                <a href="/studio" class="muted" style="font-size: 0.82rem;">Edit Published OLED Runtime</a>
+            </div>
+
+            <div class="controls-grid">
+                <div class="switch-row">
+                    <div>
+                        <div><strong>Rotation Mode</strong></div>
+                        <div class="muted" style="font-size: 0.8rem;">Enable/disable live rotation loop.</div>
+                    </div>
+                    <label class="switch" title="Toggle live rotation">
+                        <input id="rotationToggle" type="checkbox">
+                        <span class="switch-slider"></span>
+                    </label>
+                </div>
+
+                <div class="switch-row">
+                    <div>
+                        <div><strong>Standby Mode</strong></div>
+                        <div class="muted" style="font-size: 0.8rem;">Forces panel-controlled lighting off (LED strip + fan safety logic).</div>
+                    </div>
+                    <label class="switch" title="Toggle standby mode">
+                        <input id="standbyToggle" type="checkbox">
+                        <span class="switch-slider"></span>
+                    </label>
+                </div>
+
+                <div class="switch-row">
+                    <div>
+                        <div><strong>Fan Power</strong></div>
+                        <div class="muted" style="font-size: 0.8rem;">Explicit fan on/off request outside standby mode.</div>
+                    </div>
+                    <label class="switch" title="Toggle fan power">
+                        <input id="fanToggle" type="checkbox">
+                        <span class="switch-slider"></span>
+                    </label>
+                </div>
+
+                <div class="switch-row">
+                    <div>
+                        <div><strong>LED Power</strong></div>
+                        <div class="muted" style="font-size: 0.8rem;">Direct LED on/off request independent from standby mode.</div>
+                    </div>
+                    <label class="switch" title="Toggle LED power">
+                        <input id="ledToggle" type="checkbox">
+                        <span class="switch-slider"></span>
+                    </label>
+                </div>
+
+                <div class="control-row">
+                    <div class="control-label">Fan Auto-On Threshold During Standby (C)</div>
+                    <div class="row">
+                        <input id="fanAutoTemp" type="number" min="30" max="110" step="1" value="{{ fan_auto_on_temp_c }}">
+                    </div>
+                </div>
+
+                <div class="control-row">
+                    <div class="control-label">Temporary Page Override (applies on select)</div>
+                    <div class="row">
+                        <select id="livePageSelect"></select>
+                    </div>
+                </div>
+
+                <div class="control-row">
+                    <div class="control-label">Temporary Rotation Interval (ms)</div>
+                    <div class="row">
+                        <input id="rotationMs" type="number" min="250" step="50" value="{{ rotation_interval_ms }}">
+                        <button class="ghost" onclick="resumePublishedRotation()">Resume Published Rotation</button>
+                    </div>
+                </div>
+
+                <div id="safetyFeedback" class="runtime-feedback"></div>
+                <div id="runtimeFeedback" class="runtime-feedback"></div>
+            </div>
+        </div>
+    </section>
+
+    <aside class="dashboard-side">
+        <div class="card">
+            <h2 class="section-title">Runtime Status</h2>
+            <p class="section-subtitle">Current panel state, queue position, and host metrics.</p>
+
+            <div class="status-grid">
+                <div class="status-row">
+                    <div class="status-label">Active page</div>
+                    <div id="activePageStatus" class="status-value">{{ current_page }}</div>
+                </div>
+                <div class="status-group">
+                    <div class="status-group-title">Display Runtime</div>
+                    <div class="status-row">
+                        <div class="status-label">Display mode</div>
+                        <div id="displayModeStatus" class="status-value">{{ display_mode }}</div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">Rotation</div>
+                        <div><span id="rotationActiveStatus" class="status-chip">unknown</span></div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">Interval</div>
+                        <div id="rotationIntervalStatus" class="status-value">{{ rotation_interval_ms }} ms</div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">Queue</div>
+                        <div id="queueLengthStatus" class="status-value">-</div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">Queue index</div>
+                        <div id="queueIndexStatus" class="status-value">-</div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">Queue pages</div>
+                        <div id="queueSummaryStatus" class="status-value muted">-</div>
+                    </div>
+                </div>
+                <div class="status-group">
+                    <div class="status-group-title">Host Metrics</div>
+                    <div class="status-row">
+                        <div class="status-label">Hostname</div>
+                        <div id="hostnameStatus" class="status-value">loading...</div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">IP</div>
+                        <div id="ipStatus" class="status-value">loading...</div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">Uptime</div>
+                        <div id="uptimeStatus" class="status-value">loading...</div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">RAM</div>
+                        <div id="ramStatus" class="status-value">loading...</div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">CPU temp</div>
+                        <div id="cpuStatus" class="status-value">loading...</div>
+                    </div>
+                </div>
+                <div class="status-group">
+                    <div class="status-group-title">Power + Safety</div>
+                    <div class="status-row">
+                        <div class="status-label">Standby</div>
+                        <div><span id="standbyStatus" class="status-chip">unknown</span></div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">LED request</div>
+                        <div><span id="ledRequestedStatus" class="status-chip">unknown</span></div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">LED effective</div>
+                        <div><span id="ledEffectiveStatus" class="status-chip">unknown</span></div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">Fan request</div>
+                        <div><span id="fanRequestedStatus" class="status-chip">unknown</span></div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">Fan effective</div>
+                        <div><span id="fanEffectiveStatus" class="status-chip">unknown</span></div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">Fan protection</div>
+                        <div><span id="fanProtectionStatus" class="status-chip">normal</span></div>
+                    </div>
+                    <div class="status-row">
+                        <div class="status-label">Fan I2C status</div>
+                        <div id="fanErrorStatus" class="status-value muted">none</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="row" style="justify-content: space-between; align-items: baseline;">
+                <h2 class="section-title">Published OLED Runtime</h2>
+                <a href="/studio" class="muted" style="font-size: 0.82rem;">Open Studio</a>
+            </div>
+            <p class="section-subtitle">Read-only summary of boot and rotation from the published spec.</p>
+
+            <div class="status-grid">
+                <div class="status-row">
+                    <div class="status-label">Rotation interval</div>
+                    <div id="publishedIntervalStatus" class="status-value">-</div>
+                </div>
+                <div>
+                    <div class="status-label" style="margin-bottom: 0.3rem;">Boot sequence</div>
+                    <ol id="bootSummaryList" class="summary-list"></ol>
+                </div>
+                <div>
+                    <div class="status-label" style="margin-bottom: 0.3rem;">Rotation queue</div>
+                    <ol id="rotationSummaryList" class="summary-list"></ol>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<script>
+    window.DASHBOARD_BOOTSTRAP = {
+        pageCatalog: {{ page_catalog_json | safe }},
+        publishedSpec: {{ published_spec_json | safe }},
+        initialSnapshot: {
+            active_page: '{{ current_page }}',
+            display_mode: '{{ display_mode }}',
+            rotation_interval_ms: {{ rotation_interval_ms }},
+            rotation_queue: [],
+            rotation_active: '{{ display_mode }}' === 'rotating',
+            rotation_queue_len: 0,
+            rotation_index: null,
+            hostname: 'loading...',
+            ip_addr: 'loading...',
+            uptime_text: 'loading...',
+            ram_percent_text: 'loading...',
+            cpu_temp_text: 'loading...',
+            standby_active: false,
+            led_requested_on: true,
+            led_effective_on: true,
+            fan_requested_on: true,
+            fan_effective_on: true,
+            fan_auto_forced_by_temp: false,
+            fan_explicit_off_temp_warning: false,
+            fan_last_error: null,
+            fan_auto_on_temp_c: {{ fan_auto_on_temp_c }}
+        }
+    };
+</script>
+<script src="/assets/js/dashboard.js"></script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block nav_configuration %}active{% endblock %}
+{% block workspace_title %}Configuration Workspace{% endblock %}
+{% block workspace_subtitle %}Persisted service and hardware settings from <code>solstice-panel.toml</code>.{% endblock %}
+{% block workspace_actions %}
+<div class="config-actions">
+    <span class="config-action-label">System Config</span>
+    <button class="primary" type="button" onclick="saveSystemConfigGui()">Save</button>
+    <button class="ghost" type="button" onclick="reloadSystemConfigSchema()">Reload</button>
+</div>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="/assets/css/configuration.css">
+
+<div class="configuration-shell">
+    <section class="config-main">
+        <div class="card stack">
+            <div>
+                <h2 class="section-title">System Configuration</h2>
+                <p class="section-subtitle">Primary GUI editor for persisted runtime and service settings.</p>
+            </div>
+            <div class="config-help-card">
+                Configuration categories are grouped by schema sections. Use the side panel for save and advanced TOML editing.
+            </div>
+        </div>
+
+        <div id="configSchemaSections" class="config-sections"></div>
+    </section>
+
+    <aside class="config-side">
+        <div class="card stack">
+            <h2 class="section-title">Actions</h2>
+            <div class="action-stack">
+                <button class="primary" onclick="saveSystemConfigGui()">Save</button>
+                <button class="ghost" onclick="reloadSystemConfigSchema()">Reload GUI From Current Config</button>
+            </div>
+            <div id="systemConfigFeedback" class="runtime-feedback muted"></div>
+        </div>
+
+        <div class="card stack">
+            <h2 class="section-title">Advanced</h2>
+            <p class="section-subtitle">Raw TOML editing is optional and intended for advanced workflows.</p>
+            <details class="advanced">
+                <summary>Raw <code>solstice-panel.toml</code> editor</summary>
+                <div class="stack" style="margin-top: 0.75rem;">
+                    <textarea id="systemConfigEditor">{{ system_config_toml }}</textarea>
+                    <div class="row">
+                        <button class="ghost" onclick="saveSystemConfigRaw()">Save Raw TOML</button>
+                    </div>
+                </div>
+            </details>
+        </div>
+    </aside>
+</div>
+
+<script>
+    window.CONFIGURATION_BOOTSTRAP = {
+        configSchema: {{ config_schema_json | safe }}
+    };
+</script>
+<script src="/assets/js/configuration.js"></script>
+{% endblock %}

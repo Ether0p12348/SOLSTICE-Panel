@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block nav_process_explorer %}active{% endblock %}
+{% block workspace_title %}Process Explorer{% endblock %}
+{% block workspace_subtitle %}Live host process list with resource usage and kill controls.{% endblock %}
+{% block workspace_actions %}
+<div class="row">
+    <button class="ghost" type="button" onclick="refreshProcesses()">Refresh</button>
+    <label style="display: inline-flex; align-items: center; gap: 0.35rem; color: var(--muted);">
+        Auto-refresh
+        <input id="autoRefreshToggle" type="checkbox" checked style="width: auto;">
+    </label>
+    <select id="signalSelect" style="width: auto;">
+        <option value="TERM" selected>SIGTERM</option>
+        <option value="KILL">SIGKILL</option>
+        <option value="INT">SIGINT</option>
+        <option value="HUP">SIGHUP</option>
+    </select>
+</div>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="/assets/css/process_explorer.css">
+
+<section class="stack">
+    <div class="card process-toolbar">
+        <div class="row" style="justify-content: space-between;">
+            <div class="muted-line" id="summaryLine">Loading processes...</div>
+            <div class="muted-line" id="lastUpdatedLine">-</div>
+        </div>
+        <div class="row" style="justify-content: space-between; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
+            <label style="display: inline-flex; align-items: center; gap: 0.35rem; color: var(--muted);">
+                User
+                <select id="userFilterSelect" style="width: auto; min-width: 9rem;">
+                    <option value="">All users</option>
+                </select>
+            </label>
+            <div id="columnToggles" class="column-controls"></div>
+        </div>
+        <div id="feedbackLine" class="feedback"></div>
+    </div>
+
+    <div class="card" style="padding: 0.65rem;">
+        <div class="process-table-wrap">
+            <table class="process-table">
+                <thead>
+                <tr>
+                    <th data-col="name" title="Human-readable process name (mapped from executable when available).">Name</th>
+                    <th data-col="pid" title="Process ID assigned by the operating system.">PID</th>
+                    <th data-col="user" title="System user account running the process.">User</th>
+                    <th data-col="cpu" title="Current CPU usage percentage reported by ps for this process.">CPU %</th>
+                    <th data-col="mem" title="Current memory usage percentage reported by ps for this process.">MEM %</th>
+                    <th data-col="rss" title="Resident Set Size: physical RAM currently used by this process.">RSS</th>
+                    <th data-col="vsz" title="Virtual memory size reserved by this process (address space).">VSZ</th>
+                    <th data-col="state" title="Process state flags from ps (running, sleeping, zombie, etc.).">State</th>
+                    <th data-col="uptime" title="Elapsed runtime for this process since it started.">Uptime</th>
+                    <th data-col="bound" title="Local IP:port endpoints currently bound/opened by this process.">Bound IPs:Ports</th>
+                    <th data-col="command" title="Full command line used to launch the process.">Command</th>
+                    <th data-col="action" title="Safe control actions available for this process from the panel UI.">Action</th>
+                </tr>
+                </thead>
+                <tbody id="processRows">
+                <tr><td colspan="12" class="muted">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<script src="/assets/js/process_explorer.js"></script>
+{% endblock %}

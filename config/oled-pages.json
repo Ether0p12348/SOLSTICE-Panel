@@ -1,0 +1,288 @@
+[
+  {
+    "id": "avidzenith-1.0.0-title-boot",
+    "name": "Title Boot",
+    "width": 128,
+    "height": 32,
+    "meta": {
+      "schema_version": 1,
+      "version": "1.0.0",
+      "authors": [
+        "AvidZenith",
+        "Ethan Robins"
+      ],
+      "description": "The AvidZenith SOLSTICE Jetson Orin Nano machine introduction boot page.",
+      "bundle_name": "runtime",
+      "license": null,
+      "source_url": null,
+      "tags": [
+        "runtime",
+        "boot",
+        "image"
+      ]
+    },
+    "elements": [
+      {
+        "type": "static_text",
+        "x": 37,
+        "y": 14,
+        "text": "AvidZenith",
+        "size": "large",
+        "text_height_px": 15,
+        "color": "on",
+        "name": "Title"
+      },
+      {
+        "type": "static_text",
+        "x": 58,
+        "y": 23,
+        "text": "SOLSTICE",
+        "size": "large",
+        "text_height_px": 10,
+        "color": "on",
+        "name": "Name"
+      },
+      {
+        "type": "image",
+        "x": 1,
+        "y": 1,
+        "w": 30,
+        "h": 30,
+        "source": "assets/logos/az_logo.svg",
+        "mask_mode": "alpha",
+        "threshold": 126,
+        "foreground": "on",
+        "background": null,
+        "name": null
+      },
+      {
+        "type": "static_text",
+        "x": 51,
+        "y": 29,
+        "text": "Jetson Orin Nano",
+        "size": "small",
+        "text_height_px": 6,
+        "color": "on",
+        "name": null
+      }
+    ]
+  },
+  {
+    "id": "local-custom-1.0.0-sosltice-boot",
+    "name": "SOSLTICE Boot",
+    "width": 128,
+    "height": 32,
+    "meta": {
+      "schema_version": 1,
+      "version": "1.0.0",
+      "authors": [
+        "local"
+      ],
+      "description": "The AvidZenith SOLSTICE Jetson Orin Nano machine introduction boot page 2.",
+      "bundle_name": "custom",
+      "license": null,
+      "source_url": null,
+      "tags": [
+        "runtime",
+        "boot",
+        "image"
+      ]
+    },
+    "elements": [
+      {
+        "type": "static_text",
+        "x": 36,
+        "y": 17,
+        "text": "SOLSTICE",
+        "size": "large",
+        "text_height_px": 18,
+        "color": "on",
+        "name": "Title"
+      },
+      {
+        "type": "image",
+        "x": 4,
+        "y": 1,
+        "w": 27,
+        "h": 30,
+        "source": "assets/logos/SOLSTICE-Logo-Black.svg",
+        "mask_mode": "alpha",
+        "threshold": 128,
+        "foreground": "on",
+        "background": null,
+        "name": null
+      },
+      {
+        "type": "static_text",
+        "x": 39,
+        "y": 28,
+        "text": "Jetson Orin Nano",
+        "size": "large",
+        "text_height_px": 9,
+        "color": "on",
+        "name": null
+      }
+    ]
+  },
+  {
+    "id": "avidzenith-1.0.0-info-display",
+    "name": "Info Display",
+    "width": 128,
+    "height": 32,
+    "meta": {
+      "schema_version": 1,
+      "version": "1.0.0",
+      "authors": [
+        "AvidZenith",
+        "Ethan Robins"
+      ],
+      "description": "System Metrics",
+      "bundle_name": "runtime",
+      "license": null,
+      "source_url": null,
+      "tags": [
+        "runtime"
+      ]
+    },
+    "elements": [
+      {
+        "type": "dynamic_text",
+        "x": 0,
+        "y": 4,
+        "source": "sys:ip_addr",
+        "prefix": "IP  ",
+        "max_chars": 12,
+        "size": "small",
+        "text_height_px": 6,
+        "color": "on",
+        "name": "IP"
+      },
+      {
+        "type": "dynamic_text",
+        "x": 68,
+        "y": 4,
+        "source": "sys:hostname",
+        "prefix": "HOST ",
+        "max_chars": 10,
+        "size": "small",
+        "text_height_px": 6,
+        "color": "on",
+        "name": "Hostname"
+      },
+      {
+        "type": "dynamic_text",
+        "x": 0,
+        "y": 10,
+        "source": "sys:uptime_text",
+        "prefix": "UP  ",
+        "max_chars": 12,
+        "size": "small",
+        "text_height_px": 6,
+        "color": "on",
+        "name": "Uptime"
+      },
+      {
+        "type": "dynamic_text",
+        "x": 68,
+        "y": 10,
+        "source": "sys:ram_percent_text",
+        "prefix": "RAM  ",
+        "max_chars": 10,
+        "size": "small",
+        "text_height_px": 6,
+        "color": "on",
+        "name": "RAM Use Percent"
+      },
+      {
+        "type": "dynamic_text",
+        "x": 0,
+        "y": 16,
+        "source": "sys:mem_used_mib",
+        "prefix": "MEM ",
+        "max_chars": 12,
+        "size": "small",
+        "text_height_px": 6,
+        "color": "on",
+        "name": "Memory Used"
+      },
+      {
+        "type": "dynamic_text",
+        "x": 68,
+        "y": 16,
+        "source": "sys:mem_total_mib",
+        "prefix": "TOT  ",
+        "max_chars": 10,
+        "size": "small",
+        "text_height_px": 6,
+        "color": "on",
+        "name": "Memory Total"
+      },
+      {
+        "type": "dynamic_text",
+        "x": 0,
+        "y": 22,
+        "source": "sys:cpu_temp_text",
+        "prefix": "CPU ",
+        "max_chars": 12,
+        "size": "small",
+        "text_height_px": 6,
+        "color": "on",
+        "name": "CPU Temp (C)"
+      },
+      {
+        "type": "dynamic_text",
+        "x": 68,
+        "y": 22,
+        "source": "sys:cpu_usage_percent",
+        "prefix": "USE  ",
+        "max_chars": 10,
+        "size": "small",
+        "text_height_px": 6,
+        "color": "on",
+        "name": "CPU Use Percent"
+      },
+      {
+        "type": "dynamic_text",
+        "x": 24,
+        "y": 30,
+        "source": "sys:local_date_mdy",
+        "prefix": "",
+        "max_chars": 10,
+        "size": "small",
+        "text_height_px": 6,
+        "color": "on",
+        "name": "Date"
+      },
+      {
+        "type": "dynamic_text",
+        "x": 68,
+        "y": 30,
+        "source": "sys:local_time_hms",
+        "prefix": "",
+        "max_chars": 8,
+        "size": "small",
+        "text_height_px": 6,
+        "color": "on",
+        "name": "Time"
+      },
+      {
+        "type": "line",
+        "x1": 65,
+        "y1": 0,
+        "x2": 65,
+        "y2": 23,
+        "color": "on",
+        "name": "Vertical Separator"
+      },
+      {
+        "type": "line",
+        "x1": 0,
+        "y1": 24,
+        "x2": 127,
+        "y2": 24,
+        "color": "on",
+        "name": "Horizontal Separator"
+      }
+    ]
+  }
+]
